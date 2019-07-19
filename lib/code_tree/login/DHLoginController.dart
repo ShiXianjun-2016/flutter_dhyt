@@ -70,7 +70,7 @@ class LoginSafeAreaContent extends StatelessWidget {
                   usernameTextController: usernameTextController,
                   passwordTextController: passwordTextController,
                   loginCallback: (centerContext) {
-                    ProgressHud.of(centerContext).
+
                   },
                   forgetCallback: (centerContext) {},
                 ),
