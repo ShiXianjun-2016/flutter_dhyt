@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bmprogresshud/bmprogresshud.dart';
-import 'dart:async';
+import 'package:flutter_dhyt/Helper/ProgressHud/SJProgressHud.dart';
 
 class DHLoginController extends StatelessWidget {
   @override
@@ -30,6 +29,7 @@ class DHLoginController extends StatelessWidget {
 }
 
 class LoginSafeAreaContent extends StatelessWidget {
+
   final usernameTextController = TextEditingController();
   final passwordTextController = TextEditingController();
 
@@ -37,50 +37,74 @@ class LoginSafeAreaContent extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: implement build
     return SafeArea(
-      child: Stack(
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              // 预约按钮
-              Container(
-                alignment: Alignment.topRight,
-                height: 50,
-                child: FlatButton.icon(
-                  onPressed: () {},
-                  highlightColor: Colors.transparent,
-                  splashColor: Colors.transparent,
-                  icon: Image.asset("assets/images/icon/icon_reservation.png"),
-                  label: Text(
-                    "发起预约",
-                    style: TextStyle(color: Color(0xFFE16036), fontSize: 14),
+      child: ProgressHud(
+        child: Stack(
+          children: <Widget>[
+            Column(
+              children: <Widget>[
+                // 预约按钮
+                Container(
+                  alignment: Alignment.topRight,
+                  height: 50,
+                  child: FlatButton.icon(
+                    onPressed: () {},
+                    highlightColor: Colors.transparent,
+                    splashColor: Colors.transparent,
+                    icon:
+                        Image.asset("assets/images/icon/icon_reservation.png"),
+                    label: Text(
+                      "发起预约",
+                      style: TextStyle(color: Color(0xFFE16036), fontSize: 14),
+                    ),
                   ),
                 ),
-              ),
 
-              // logo
-              Container(
-                padding: EdgeInsets.only(top: 60),
-                child: Image.asset("assets/images/login/login_logo.png"),
-              ),
-
-              // 账号密码
-              ProgressHud(
-                child: LoginEditCenterView(
-                  paddingTop: 80,
-                  usernameTextController: usernameTextController,
-                  passwordTextController: passwordTextController,
-                  loginCallback: (centerContext) {
-
-                  },
-                  forgetCallback: (centerContext) {},
+                // logo
+                Container(
+                  padding: EdgeInsets.only(top: 60),
+                  child: Image.asset("assets/images/login/login_logo.png"),
                 ),
-              ),
-            ],
-          ),
-          LoginBottomRegisteredView(),
-        ],
+
+                Builder(builder: (context) {
+                  return LoginEditCenterView(
+                    paddingTop: 80,
+                    usernameTextController: usernameTextController,
+                    passwordTextController: passwordTextController,
+                    loginCallback: (){_chickLoginItem(context);},
+                    forgetCallback: () {_chickForgetItem(context);},
+                  );
+                }),
+              ],
+            ),
+            LoginBottomRegisteredView(),
+          ],
+        ),
       ),
     );
+  }
+
+  void _chickLoginItem(BuildContext context){
+
+    if (this.usernameTextController.text.length == 0){
+      ProgressHud.of(context).showErrorAndDismiss(text: "请输入用户名");
+      return;
+    }
+
+    if (this.passwordTextController.text.length == 0){
+      ProgressHud.of(context).showErrorAndDismiss(text: "请输入密码");
+      return;
+    }
+
+    if (this.passwordTextController.text.length < 6){
+      ProgressHud.of(context).showErrorAndDismiss(text: "密码应大于6位");
+      return;
+    }
+
+
+  }
+
+  void _chickForgetItem(BuildContext context){
+
   }
 }
 
@@ -90,8 +114,8 @@ class LoginEditCenterView extends StatelessWidget {
   final TextEditingController usernameTextController;
   final TextEditingController passwordTextController;
 
-  final void Function(BuildContext centerContext) loginCallback;
-  final void Function(BuildContext centerContext) forgetCallback;
+  final VoidCallback loginCallback;
+  final VoidCallback forgetCallback;
 
   LoginEditCenterView(
       {Key key,
@@ -135,9 +159,7 @@ class LoginEditCenterView extends StatelessWidget {
             child: FlatButton(
                 highlightColor: Colors.transparent,
                 splashColor: Colors.transparent,
-                onPressed:(){
-                  this.loginCallback(context);
-                },
+                onPressed: this.forgetCallback,
                 child: Text(
                   "忘记密码",
                   style: TextStyle(
@@ -157,9 +179,7 @@ class LoginEditCenterView extends StatelessWidget {
                   highlightColor: Colors.transparent,
                   splashColor: Colors.transparent,
                   color: Color(0xFFE16036),
-                  onPressed: (){
-                    this.forgetCallback(context);
-                  },
+                  onPressed: this.loginCallback,
                   child: Text(
                     "登录",
                     style: TextStyle(color: Colors.white),
