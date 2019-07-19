@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dhyt/Helper/ProgressHud/SJProgressHud.dart';
+import 'package:dio/dio.dart';
+
+import 'dart:convert';
+import 'package:convert/convert.dart';
+import 'package:crypto/crypto.dart';
+
+
+
 
 class DHLoginController extends StatelessWidget {
   @override
@@ -100,12 +108,37 @@ class LoginSafeAreaContent extends StatelessWidget {
       return;
     }
 
+    _requestLoginData(context, this.usernameTextController.text, this.passwordTextController.text);
 
   }
 
   void _chickForgetItem(BuildContext context){
 
   }
+
+  void _requestLoginData(BuildContext context, String username, String password) async {
+
+    ProgressHud.of(context).showLoading(text: "登录中...");
+
+    BaseOptions dioOptions = BaseOptions(
+      baseUrl: "http://192.168.1.233/dhyt/api/",
+    );
+
+    final parames = {"loginid" : username, "password" : _generateMd5(password)};
+
+    Dio dio = new Dio(dioOptions);
+    final response = await dio.post("login", queryParameters: parames);
+    print(response.data.toString());
+
+    ProgressHud.of(context).dismiss();
+  }
+
+  String _generateMd5(String data) {
+    var content = new Utf8Encoder().convert(data);
+    var digest = md5.convert(content);
+    return hex.encode(digest.bytes);
+  }
+
 }
 
 class LoginEditCenterView extends StatelessWidget {
