@@ -6,13 +6,16 @@ import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 
-
+import 'package:flutter_dhyt/code_tree/reservation/DHReservationCreateController.dart';
 
 
 class DHLoginController extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primaryColor: Color(0xFFE16036),
+      ),
       title: "地厚云图登录",
       home: Scaffold(
         resizeToAvoidBottomPadding: false,
@@ -55,7 +58,9 @@ class LoginSafeAreaContent extends StatelessWidget {
                   alignment: Alignment.topRight,
                   height: 50,
                   child: FlatButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => DHReservationCreateController()));
+                    },
                     highlightColor: Colors.transparent,
                     splashColor: Colors.transparent,
                     icon:
@@ -127,10 +132,16 @@ class LoginSafeAreaContent extends StatelessWidget {
     final parames = {"loginid" : username, "password" : _generateMd5(password)};
 
     Dio dio = new Dio(dioOptions);
-    final response = await dio.post("login", queryParameters: parames);
-    print(response.data.toString());
-
+    final response = await dio.post("login", data: parames);
+    print(response.data);
     ProgressHud.of(context).dismiss();
+
+
+    if(int.parse(response.data["errcode"].toString()) == 200){
+      ProgressHud.of(context).showSuccessAndDismiss(text: "登录成功");
+    }else{
+      ProgressHud.of(context).showSuccessAndDismiss(text: "登录失败");
+    }
   }
 
   String _generateMd5(String data) {
